@@ -1,0 +1,315 @@
+/* -----------------------------
+
+
+Original Css at: https://codyhouse.co/gem/3d-rotating-navigation/
+
+
+ */
+@import "mixins";
+@import "variables";
+
+/* -------------------------------- 
+
+Primary style
+
+-------------------------------- */
+*, *::after, *::before {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 62.5%;
+}
+
+body {
+  font-size: 1.6rem;
+  font-family: "Open Sans", sans-serif;
+  background-color: #485274;
+}
+
+a{
+  text-decoration: none;
+}
+/* -------------------------------- 
+
+Main Components 
+
+-------------------------------- */
+.cd-header{
+	height: 80px;
+	width: 90%;
+	margin: 0 auto;
+	@include transition($transition: transform $transitionSpeed);
+	@include transform();
+   -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+	
+	&::after{
+		clear:both;
+		content:"";
+		display: table;
+	}
+	&.nav-is-visible{
+		@include transform($translateY:80px);
+		@include screen(false, 'sm'){
+			@include transform($translateY:170px);
+		}
+	}
+}
+.cd-logo{
+	float: left;
+	margin-top: 28px;
+}
+.cd-3d-nav-trigger{
+	position: relative;
+	float: right;
+	height: 45px;
+	width: 45px;
+	margin-top: 18px;
+	overflow: hidden;
+	text-indent: 100%;
+	white-space: nowrap;
+	color: transparent;
+
+	span{
+		/* this is the central line */
+		top: 21px;
+		left: 8px;
+		@include transition(background .2s $transitionSpeed);
+		&,
+		&::before,
+		&::after{
+		/* hamburger icon in CSS */
+		  position: absolute;
+		  width: 28px;
+		  height: 3px;
+		  background-color: #FFF;
+		  -webkit-backface-visibility: hidden;
+		  backface-visibility: hidden;
+		}
+		&::before, 
+		&::after{
+			/* these are the upper and lower lines */
+		  content: '';
+		  left: 0;
+		  @include transition($transition:transform 0.2s 0.5s);
+		}
+		&::before{
+			bottom: 8px;
+		}
+		&::after{	
+			top: 8px;
+		}
+	}//span
+	.nav-is-visible &{
+
+			/* Hamburger style on active */
+			span{
+				background: rgba(255,255,255,0);
+			}
+			//top line
+			span::before{
+				background-color: white;
+				@include transform($translateY:10px, $rotate:-45deg);
+			}
+			//bottom line
+			span::after{
+				background-color: black;
+				@include transform($translateY:-10px, $rotate:45deg);
+			}
+		
+
+	}//.nav-is-visible
+}//.cd-nav-trigger
+.cd-3d-nav-container{
+	/* this is the 3D navigation container */
+	position: fixed;
+	top: 0;
+	left: 0;
+	height: 80px;
+	width: 100%;
+	background-color: #000000;
+  	visibility: hidden;
+  /* enable a 3D-space for children elements */
+	@include  perspective(1000px);
+	@include transform($translateY:-100%);
+	@include transition($transition: (transform $transitionSpeed 0s, visibility $transitionSpeed));
+	&.nav-is-visible{
+		visibility: visible;
+		z-index:1000;
+		@include transform($translateY: 0);
+		@include transition($transition: (transform $transitionSpeed 0s, visibility $transitionSpeed));
+	}
+	
+	@include screen(false, 'sm'){
+		height: 170px;
+	}
+}//cd-3d-nav-container
+.cd-3d-nav{
+	position: relative;
+	height: 100%;
+	background-color: #343c55;
+	@include transform($translateZ:0, $origin:(center bottom), $rotateX:90deg);
+	@include transition(transform $transitionSpeed);
+	-webkit-backface-visibility: hidden;
+	backface-visibility: hidden;
+	&::after{
+  /* menu dark cover layer - to enhance perspective effect */
+		content:'';
+		position: absolute;
+		top: 0;
+		left: 0;
+		height: 100%;
+		width: 100%;
+		background-color: #000;
+		opacity: 1;
+		@include transition($transition:(opacity $transitionSpeed, visibility $transitionSpeed 0s));
+	}
+
+	li{
+		height: 100%;
+		width: (100%/$numberOfMenuItems);
+		float:left;
+		@for $i from 1 through length($menuItems){
+			&:nth-of-type(#{$i}) a::before{
+				background-image: url(map-get(nth($menuItems, $i), "icon"));
+			}
+		}
+	}
+	
+	a{
+		text-decoration: none;
+
+		position: relative;
+		display: block;
+		height: 100%;
+		color: transparent;
+		@include transition($transition:background-color $transitionSpeed);
+		&::before{
+			content: '';
+			position: absolute;
+			height: 32px;
+			width: 32px;
+			left: 50%;
+			top: 50%;
+			bottom: auto;
+			right: auto;
+			@include transform($translateX:-50%, $translateY:-50%);
+			background-size: 32px 64px;
+			background-repeat: no-repeat;
+			background-position: 0 0;
+		}
+
+	}//a
+	.no-touch & {
+		a:hover{
+			background-color:$navBackHoverColor;
+		}
+		.cd-selected a:hover{
+			background-color: $navBackActiveColor;
+		}
+	}
+	& .cd-selected a{
+		background-color: $navBackActiveColor;
+		&::before{
+			background-position: 0 -32px;
+		}
+	}
+
+	.nav-is-visible &{
+		@include transform($translateZ:0);
+		
+		&::after{
+			opacity: 0;
+			visibility: hidden;
+			@include transition($transition:(opacity $transitionSpeed, visibility 0s $transitionSpeed));
+		}
+	}
+
+	@include screen(false, 'sm'){
+		a{
+			padding: 7.6em 1em 0;
+			color: #ffffff;
+		    font-size: 1.3rem;
+		    font-weight: 600;
+		    text-align: center;
+		    -webkit-font-smoothing: antialiased;
+		    -moz-osx-font-smoothing: grayscale;
+		    /* truncate text with ellipsis if too long */
+		    white-space: nowrap;
+		    overflow: hidden;
+		    text-overflow: ellipsis;
+		    &::before{
+				top: 4.4em;
+			    left: 50%;
+			    right: auto;
+			    @include transform($translateX:-50%);
+		    }
+		}
+	}
+}//.cd-3d-nav
+
+.cd-marker{
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	height: 3px;
+	width: (100%/$numberOfMenuItems);
+	@include transform($origin:(center bottom), $translateZ:0, $rotateX:90deg);
+	@include transition($transition:(transform $transitionSpeed, left $transitionSpeed, color $transitionSpeed, background $transitionSpeed));
+
+	&::before{
+		content:'';
+		position: absolute;
+		bottom: 3px;
+		left: 50%;
+		right: auto;
+		height: 0;
+		width: 0;
+		border: 10px solid transparent;
+		border-bottom-color:inherit;
+		@include transform($translateX:-50%);
+
+	}
+	.nav-is-visible &{
+		@include transform($translateZ:0);
+	}
+}//.cd-marker
+
+@for $i from 0 through length($menuItems)-1{
+	$theColor: map-get(nth($menuItems,$i + 1), "color");
+	.color-#{$i+1} {
+		color: $theColor;
+		background-color:$theColor;
+		left:(100%/$numberOfMenuItems)*(($i) % $numberOfMenuItems);
+	}
+}
+
+#{$mainSelector}{
+	@include transition($transition: (transform $transitionSpeed));
+	@include transform();
+	-webkit-backface-visibility: hidden;
+	backface-visibility: hidden;
+	
+	h1{
+		text-align: center;
+		font-size: 2.4rem;
+		font-weight: 300;
+		color: #ffffff;
+		margin: 2em auto;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+	&.nav-is-visible{
+		@include transform($translateY:80px);
+	}
+	@include screen(false, 'sm'){
+		&.nav-is-visible{
+			@include transform($translateY:170px);
+		}
+		h1{
+			font-size: 3.6rem;
+			margin: 4em auto;
+		}
+	}
+}

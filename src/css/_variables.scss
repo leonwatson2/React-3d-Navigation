@@ -1,0 +1,16 @@
+
+/* Selector for main body */
+$mainSelector:"main";
+
+$numberOfMenuItems:5;
+$navBackHoverColor:#2b3145;
+$navBackActiveColor:#212635;
+/* Path to icon and marker cikir when item is selected */
+$menuItems:((icon:"../img/icon-1.svg", color:#9a57bd), 
+			(icon:"../img/icon-2.svg", color:#c96aa4), 
+			(icon:"../img/icon-3.svg", color:#d6915e), 
+			(icon:"../img/icon-4.svg", color:#5397c7),
+			(icon:"../img/icon-5.svg", color:#77cd91));
+
+
+$transitionSpeed:.5s;
