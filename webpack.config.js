@@ -3,29 +3,33 @@ var webpack = require('webpack');
 var path = require('path');
 
 module.exports = {
-  context: path.join(__dirname, "src"),
-  devtool: debug ? "inline-sourcemap" : null,
+  context:path.resolve('src'),
   entry: "./js/client.js",
+  output: {
+    path:"build",
+    filename: "bundle.js",
+    publicPath:path.resolve('build')
+  },
+  devServer: {
+      inline: true,
+      contentBase: './build',
+      port: 3000
+  },
   module: {
     loaders: [
       {
-        test: /\.jsx?$/,
-        exclude: /(node_modules|bower_components)/,
-        loader: 'babel-loader',
+        test: /\.js$/,
+        exclude: /(node_modules)/,
+        loader: ['babel'],
         query: {
-          presets: ['react', 'es2015', 'stage-0'],
-          plugins: ['react-html-attrs', 'transform-class-properties', 'transform-decorators-legacy'],
+          presets: ['latest', 'stage-0']
         }
+      },
+      {
+        test: /\.json$/,
+        exclude: /(node_modules)/,
+        loader: 'json-loader'
       }
     ]
-  },
-  output: {
-    path: __dirname + "/src/",
-    filename: "client.min.js"
-  },
-  plugins: debug ? [] : [
-    new webpack.optimize.DedupePlugin(),
-    new webpack.optimize.OccurenceOrderPlugin(),
-    new webpack.optimize.UglifyJsPlugin({ mangle: false, sourcemap: false }),
-  ],
-};
+  }
+}
